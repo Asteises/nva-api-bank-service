@@ -1,16 +1,18 @@
 package ru.asteises.bankservice.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewCardDto {
+public class NewCreditCardDto {
 
+    @NonNull
     private String cardNumber;
+    @NonNull
+    private Double creditLimit;
+    @NonNull
+    private Double creditFunds;
     private boolean isBlocked;
 }

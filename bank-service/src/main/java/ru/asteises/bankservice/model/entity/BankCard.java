@@ -1,14 +1,35 @@
 package ru.asteises.bankservice.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@MappedSuperclass
+@ToString
 public abstract class BankCard {
 
+    @Id
+    @Column(name = "id")
+    private UUID id;
     private String cardNumber;
-    private double balance;
     private boolean isBlocked;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BankCard bankCard = (BankCard) o;
+        return Objects.equals(id, bankCard.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

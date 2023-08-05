@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.asteises.bankservice.exception.CreditCardNotFound;
+import ru.asteises.bankservice.exception.NotEnoughFundsException;
 import ru.asteises.bankservice.mapper.CreditCardMapper;
 import ru.asteises.bankservice.model.dto.CreditCardBalanceInfoDto;
 import ru.asteises.bankservice.model.dto.CreditCardVisualDto;
@@ -67,23 +68,32 @@ public class CreditCardServiceImpl implements CreditCardService {
     }
 
     @Override
-    public CreditCardBalanceInfoDto showCreditCardBalanceInfo(UUID cardId) {
+    public CreditCardBalanceInfoDto showBankCardBalanceInfo(UUID cardId) {
         CreditCard creditCard = getCreditCardFromRepo(cardId);
         return CreditCardMapper.INSTANCE.entityToBalanceInfoDto(creditCard);
     }
 
     @Override
-    public CreditCardBalanceInfoDto refundCreditCard(UUID cardId, double refundSum) {
+    public CreditCardBalanceInfoDto refundBankCard(UUID cardId, double refundSum) {
         CreditCard creditCard = getCreditCardFromRepo(cardId);
         refundBalance(creditCard, refundSum);
         creditCardRepo.save(creditCard);
-        log.info("Credit card balance refund {}", creditCard.toString());
+        log.info("Refund credit card success: {}", creditCard.toString());
         return CreditCardMapper.INSTANCE.entityToBalanceInfoDto(creditCard);
     }
 
     @Override
-    public CreditCardBalanceInfoDto pay(UUID cardId, double paySum) {
-        return null;
+    public CreditCardBalanceInfoDto payFromBankCard(UUID cardId, double paySum) throws NotEnoughFundsException {
+        CreditCard creditCard = getCreditCardFromRepo(cardId);
+        // создаем переменную и передаем данные в метод оплаты
+        Boolean isPaid = pay(creditCard, paySum);
+        if (!isPaid) {
+            throw new NotEnoughFundsException(creditCard.toString());
+        } else {
+            // обновляем данные в бд
+            creditCardRepo.save(creditCard);
+            return CreditCardMapper.INSTANCE.entityToBalanceInfoDto(creditCard);
+        }
     }
 
     private CreditCard getCreditCardFromRepo(UUID cardId) throws CreditCardNotFound {
@@ -117,5 +127,62 @@ public class CreditCardServiceImpl implements CreditCardService {
             creditCard.setDebitFunds(debitFunds + refundSum);
             log.info("debit funds: " + debitFunds);
         }
+    }
+
+    private Boolean pay(CreditCard creditCard, double paySum) {
+        log.info("pay sum: {}", paySum);
+        // переменные для удобства
+        double debitFunds = creditCard.getDebitFunds();
+        double creditFunds = creditCard.getCreditFunds();
+        // высчитываем кэшбэк за покупку
+        double cashback = cashback(paySum);
+        // если сумма списания меньше или равна сумме собственных средств, то:
+        if (paySum < debitFunds || paySum == debitFunds) {
+            // списываем её из собственных средств
+            creditCard.setDebitFunds(debitFunds - paySum);
+            log.info("debit funds осталось до cashback: {}", debitFunds);
+            // добавляем кэшбэк
+            creditCard.setDebitFunds(cashback);
+            log.info("debit funds осталось после cashback: {}", debitFunds);
+            return true;
+        } else {
+            // если сумма списания меньше остатка кредитных средств или равна им, то:
+            if (paySum < creditFunds || paySum == creditFunds) {
+                // если собственные средства остались, то:
+                if (debitFunds > 0) {
+                    // сначала пересчитываем сумму списания с учетом остатка
+                    paySum -= debitFunds;
+                    log.info("спишется остаток из debit funds: {}", debitFunds);
+                    log.info("будет списано из credit funds: {}", paySum);
+                    log.info("будет добавлен cashback: {}", cashback);
+                    // затем обнуляем остаток и добавляем кэшбэк
+                    creditCard.setDebitFunds(0.0 + cashback);
+                }
+                // вычитаем сумму покупки из кредитных средств
+                creditCard.setCreditFunds(creditFunds - paySum);
+                // добавляем cashback всегда на собственные средства
+                creditCard.setDebitFunds(debitFunds + cashback);
+                log.info("credit funds после оплаты: {} ", creditFunds);
+                log.info("debit funds после cashback: {}", debitFunds);
+                return true;
+                // если сумма списания больше суммы собственных и кредитных средств, то:
+            } else {
+                log.info("Not enough funds");
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Метод высчитываем сумму кэшбэка в зависимости от суммы покупки.
+     */
+    private double cashback(double paySum) {
+        double cashback;
+        if (paySum >= 5000.0) {
+            cashback = paySum * 5 / 100;
+            log.info("cashback: {}", cashback);
+            return cashback;
+        }
+        return 0.0;
     }
 }

@@ -1,16 +1,10 @@
 package ru.asteises.bankservice.controller;
 
-import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.asteises.bankservice.model.dto.CreditCardBalanceInfoDto;
 import ru.asteises.bankservice.model.dto.CreditCardVisualDto;
 import ru.asteises.bankservice.model.dto.NewCreditCardDto;
 import ru.asteises.bankservice.service.CreditCardService;
@@ -26,22 +20,23 @@ public class CreditCardController {
     private final CreditCardService creditCardService;
 
     @PostMapping("/add")
-    public ResponseEntity<CreditCardVisualDto> addNewCreditCard(@NotNull @RequestBody NewCreditCardDto newCreditCardDto) {
+    public ResponseEntity<CreditCardVisualDto> addNewCreditCard(@NonNull @RequestBody NewCreditCardDto newCreditCardDto) {
         return ResponseEntity.ok(creditCardService.addNewCreditCard(newCreditCardDto));
     }
 
     @GetMapping("/get/{cardId}")
-    public ResponseEntity<CreditCardVisualDto> getCreditCardById(@NotNull @PathVariable UUID cardId) {
+    public ResponseEntity<CreditCardVisualDto> getCreditCardById(@NonNull @PathVariable UUID cardId) {
         return ResponseEntity.ok(creditCardService.getCreditCardById(cardId));
     }
 
     @PatchMapping("/limit/{cardId}")
-    public ResponseEntity<CreditCardVisualDto> changeCreditLimit(@NotNull @PathVariable UUID cardId, @RequestParam double limit) {
+    public ResponseEntity<CreditCardVisualDto> changeCreditLimit(@NonNull @PathVariable UUID cardId,
+                                                                 @RequestParam double limit) {
         return ResponseEntity.ok(creditCardService.changeCreditLimit(cardId, limit));
     }
 
     @PatchMapping("/block/{cardId}")
-    public ResponseEntity<CreditCardVisualDto> blockCreditCardById(@NotNull @PathVariable UUID cardId) {
+    public ResponseEntity<CreditCardVisualDto> blockCreditCardById(@NonNull @PathVariable UUID cardId) {
         return ResponseEntity.ok(creditCardService.blockCreditCardById(cardId));
     }
 
@@ -53,5 +48,22 @@ public class CreditCardController {
     @GetMapping("/get/all/blocked")
     public ResponseEntity<List<CreditCardVisualDto>> getAllBlockedCreditCards() {
         return ResponseEntity.ok(creditCardService.getAllBlockedCards());
+    }
+
+    @GetMapping("/balance/info/{cardId}")
+    public ResponseEntity<CreditCardBalanceInfoDto> showCreditCardBalanceInfo(@NonNull @PathVariable UUID cardId) {
+        return ResponseEntity.ok((CreditCardBalanceInfoDto) creditCardService.showBankCardBalanceInfo(cardId));
+    }
+
+    @PatchMapping("/balance/refund/{cardId}")
+    public ResponseEntity<CreditCardBalanceInfoDto> refundCreditCard(@NonNull @PathVariable UUID cardId,
+                                                                     @RequestParam double refundSum) {
+        return ResponseEntity.ok((CreditCardBalanceInfoDto) creditCardService.refundBankCard(cardId, refundSum));
+    }
+
+    @PatchMapping("/balance/pay/{cardId}")
+    public ResponseEntity<CreditCardBalanceInfoDto> payFromCreditCard(@NonNull @PathVariable UUID cardId,
+                                                                      @RequestParam double paySum) {
+        return ResponseEntity.ok((CreditCardBalanceInfoDto) creditCardService.refundBankCard(cardId, paySum));
     }
 }

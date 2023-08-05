@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.asteises.bankservice.exception.CreditCardNotFound;
 import ru.asteises.bankservice.mapper.CreditCardMapper;
+import ru.asteises.bankservice.model.dto.CreditCardBalanceInfoDto;
 import ru.asteises.bankservice.model.dto.CreditCardVisualDto;
 import ru.asteises.bankservice.model.dto.NewCreditCardDto;
 import ru.asteises.bankservice.model.entity.CreditCard;
@@ -65,10 +66,56 @@ public class CreditCardServiceImpl implements CreditCardService {
         return CreditCardMapper.INSTANCE.entityToVisualDto(creditCards);
     }
 
+    @Override
+    public CreditCardBalanceInfoDto showCreditCardBalanceInfo(UUID cardId) {
+        CreditCard creditCard = getCreditCardFromRepo(cardId);
+        return CreditCardMapper.INSTANCE.entityToBalanceInfoDto(creditCard);
+    }
+
+    @Override
+    public CreditCardBalanceInfoDto refundCreditCard(UUID cardId, double refundSum) {
+        CreditCard creditCard = getCreditCardFromRepo(cardId);
+        refundBalance(creditCard, refundSum);
+        creditCardRepo.save(creditCard);
+        log.info("Credit card balance refund {}", creditCard.toString());
+        return CreditCardMapper.INSTANCE.entityToBalanceInfoDto(creditCard);
+    }
+
+    @Override
+    public CreditCardBalanceInfoDto pay(UUID cardId, double paySum) {
+        return null;
+    }
+
     private CreditCard getCreditCardFromRepo(UUID cardId) throws CreditCardNotFound {
         CreditCard creditCard = creditCardRepo.getCreditCardById(cardId)
                 .orElseThrow(() -> new CreditCardNotFound(cardId.toString()));
         log.info("Get credit card from repo: {}", creditCard.toString());
         return creditCard;
+    }
+
+    private void refundBalance(CreditCard creditCard, double refundSum) {
+        log.info("refundSum: " + refundSum);
+        double creditLimit = creditCard.getCreditLimit();
+        double creditFunds = creditCard.getCreditFunds();
+        double debitFunds = creditCard.getDebitFunds();
+        // если есть кредитный долг, то вычисляем сумму долга
+        if (creditLimit > creditFunds) {
+            double debt = creditLimit - creditFunds;
+            log.info("total debt: " + debt);
+            // если входящий платеж равен или меньше долга, то просто зачисляем его в кредитные средства
+            if (refundSum == debt || refundSum < debt) {
+                creditCard.setCreditFunds(creditFunds + refundSum);
+                log.info("credit funds после пополнения: " + creditFunds);
+                // если входящий платеж больше долга, то закрываем долг и остаток зачисляем в собственные средства
+            } else {
+                creditCard.setCreditFunds(creditFunds + debt);
+                creditCard.setDebitFunds(debitFunds + refundSum - debt);
+                log.info("credit funds после пополнения: " + creditFunds);
+                log.info("debit funds после пополнения: " + debitFunds);
+            }
+        } else {
+            creditCard.setDebitFunds(debitFunds + refundSum);
+            log.info("debit funds: " + debitFunds);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package ru.asteises.bankservice.service;
 
+import ru.asteises.bankservice.model.dto.CreditCardBalanceInfoDto;
 import ru.asteises.bankservice.model.dto.CreditCardVisualDto;
 import ru.asteises.bankservice.model.dto.NewCreditCardDto;
 
@@ -14,4 +15,9 @@ public interface CreditCardService {
     CreditCardVisualDto blockCreditCardById(UUID cardId);
     List<CreditCardVisualDto> getAllNonBlockedCreditCards();
     List<CreditCardVisualDto> getAllBlockedCards();
+
+    CreditCardBalanceInfoDto showCreditCardBalanceInfo(UUID cardId);
+    CreditCardBalanceInfoDto refundCreditCard(UUID cardId, double refundSum);
+    CreditCardBalanceInfoDto pay(UUID cardId, double paySum);
+
 }

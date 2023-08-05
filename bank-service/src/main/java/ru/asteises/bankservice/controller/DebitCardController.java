@@ -1,5 +1,6 @@
 package ru.asteises.bankservice.controller;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,27 +19,27 @@ public class DebitCardController {
     private final DebitCardService debitCardService;
 
     @PostMapping("/add")
-    public ResponseEntity<DebitCardVisualDto> addNewCreditCard(@RequestBody NewDebitCardDto newDebitCardDto) {
-        return ResponseEntity.ok(debitCardService.addNewCreditCard(newDebitCardDto));
+    public ResponseEntity<DebitCardVisualDto> addNewDebitCard(@NotNull @RequestBody NewDebitCardDto newDebitCardDto) {
+        return ResponseEntity.ok(debitCardService.addNewDebitCard(newDebitCardDto));
     }
 
     @GetMapping("/get/{cardId}")
-    public ResponseEntity<DebitCardVisualDto> getCreditCardById(@PathVariable UUID cardId) {
-        return ResponseEntity.ok(debitCardService.getCreditCardById(cardId));
+    public ResponseEntity<DebitCardVisualDto> getDebitCardById(@NotNull @PathVariable UUID cardId) {
+        return ResponseEntity.ok(debitCardService.getDebitCardById(cardId));
     }
 
     @PatchMapping("/block/{cardId}")
-    public ResponseEntity<DebitCardVisualDto> blockCreditCardById(@PathVariable UUID cardId) {
-        return ResponseEntity.ok(debitCardService.blockCreditCardById(cardId));
+    public ResponseEntity<DebitCardVisualDto> blockDebitCardById(@NotNull @PathVariable UUID cardId) {
+        return ResponseEntity.ok(debitCardService.blockDebitCardById(cardId));
     }
 
     @GetMapping("/get/all")
-    public ResponseEntity<List<DebitCardVisualDto>> getAllNonBlockedCreditCards() {
-        return ResponseEntity.ok(debitCardService.getAllNonBlockedCreditCards());
+    public ResponseEntity<List<DebitCardVisualDto>> getAllNonBlockedDebitCards() {
+        return ResponseEntity.ok(debitCardService.getAllNonBlockedDebitCards());
     }
 
     @GetMapping("/get/all/blocked")
-    public ResponseEntity<List<DebitCardVisualDto>> getAllBlockedCards() {
-        return ResponseEntity.ok(debitCardService.getAllBlockedCards());
+    public ResponseEntity<List<DebitCardVisualDto>> getAllBlockedDebitCards() {
+        return ResponseEntity.ok(debitCardService.getAllBlockedDebitCards());
     }
 }

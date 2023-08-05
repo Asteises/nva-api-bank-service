@@ -4,6 +4,7 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import ru.asteises.bankservice.model.dto.CreditCardBalanceInfoDto;
 import ru.asteises.bankservice.model.dto.CreditCardVisualDto;
 import ru.asteises.bankservice.model.dto.NewCreditCardDto;
 import ru.asteises.bankservice.model.entity.CreditCard;
@@ -20,8 +21,7 @@ public interface CreditCardMapper {
 
     @Mapping(target = "id", expression = "java(UUID.randomUUID())")
     CreditCard dtoToEntity(NewCreditCardDto newCreditCardDto);
-
     CreditCardVisualDto entityToVisualDto(CreditCard creditCard);
-
     List<CreditCardVisualDto> entityToVisualDto(List<CreditCard> creditCards);
+    CreditCardBalanceInfoDto entityToBalanceInfoDto(CreditCard creditCard);
 }

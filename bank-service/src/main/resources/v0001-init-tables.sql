@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS credit_cards
     credit_funds FLOAT8,
     credit_limit FLOAT8,
     debit_funds  FLOAT8,
-    is_blocked   BOOLEAN
+    is_blocked   BOOLEAN,
+    cashback     FLOAT8
 );
 
 CREATE TABLE IF NOT EXISTS debit_cards

@@ -1,6 +1,7 @@
 package ru.asteises.bankservice.model.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
@@ -20,7 +21,7 @@ public class CreditCard extends BankCard {
     private double creditFunds;
     @Column(name = "debit_funds")
     private double debitFunds;
-
-    //TODO balance для кредитной карты это сумма собственных средств и кредитных
+    @Column(name = "cashback")
+    private double cashback;
 
 }

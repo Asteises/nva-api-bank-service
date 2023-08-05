@@ -2,10 +2,15 @@ package ru.asteises.bankservice.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.asteises.bankservice.model.entity.DebitCard;
+
+import java.util.UUID;
 
 @Getter
 @Setter
-public class DebitCardVisualDto extends DebitCard {
+public class DebitCardVisualDto {
 
+    private UUID id;
+    private String cardNumber;
+    private double balance;
+    private boolean isBlocked;
 }

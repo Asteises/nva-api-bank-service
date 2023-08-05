@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.asteises.bankservice.exception.CreditCardNotFound;
+import ru.asteises.bankservice.exception.NotEnoughCreditFunds;
 import ru.asteises.bankservice.exception.NotEnoughFundsException;
 import ru.asteises.bankservice.mapper.CreditCardMapper;
 import ru.asteises.bankservice.model.dto.CreditCardBalanceInfoDto;
@@ -40,7 +41,12 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Override
     public CreditCardVisualDto changeCreditLimit(UUID cardId, double newCreditLimit) {
         CreditCard creditCard = getCreditCardFromRepo(cardId);
-        creditCard.setCreditLimit(newCreditLimit);
+        if (creditCard.getCreditFunds() == creditCard.getCreditLimit()) {
+            creditCard.setCreditLimit(newCreditLimit);
+            creditCard.setCreditFunds(newCreditLimit);
+        } else {
+            throw new NotEnoughCreditFunds(String.valueOf(creditCard.getCreditFunds()));
+        }
         creditCardRepo.save(creditCard);
         log.info("Credit card {} change credit limit {}", creditCard, newCreditLimit);
         return CreditCardMapper.INSTANCE.entityToVisualDto(creditCard);
@@ -57,13 +63,13 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     public List<CreditCardVisualDto> getAllNonBlockedCreditCards() {
-        List<CreditCard> creditCards = creditCardRepo.getAllByBlockedFalse();
+        List<CreditCard> creditCards = creditCardRepo.getAllByBlockedFalse(false);
         return CreditCardMapper.INSTANCE.entityToVisualDto(creditCards);
     }
 
     @Override
     public List<CreditCardVisualDto> getAllBlockedCards() {
-        List<CreditCard> creditCards = creditCardRepo.getAllByBlockedTrue();
+        List<CreditCard> creditCards = creditCardRepo.getAllByBlockedTrue(true);
         return CreditCardMapper.INSTANCE.entityToVisualDto(creditCards);
     }
 
@@ -142,7 +148,7 @@ public class CreditCardServiceImpl implements CreditCardService {
             creditCard.setDebitFunds(debitFunds - paySum);
             log.info("debit funds осталось до cashback: {}", debitFunds);
             // добавляем кэшбэк
-            creditCard.setDebitFunds(cashback);
+            creditCard.setDebitFunds(debitFunds + cashback);
             log.info("debit funds осталось после cashback: {}", debitFunds);
             return true;
         } else {

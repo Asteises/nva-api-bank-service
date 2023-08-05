@@ -17,7 +17,9 @@ public abstract class BankCard {
     @Id
     @Column(name = "id")
     private UUID id;
+    @Column(name = "card_number")
     private String cardNumber;
+    @Column(name = "blocked")
     private boolean isBlocked;
 
     @Override

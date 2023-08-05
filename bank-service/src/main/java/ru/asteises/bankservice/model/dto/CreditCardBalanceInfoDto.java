@@ -7,9 +7,8 @@ import lombok.Setter;
 @Setter
 public class CreditCardBalanceInfoDto {
 
-    private double cardNumber;
+    private String cardNumber;
     private double creditLimit;
     private double creditFunds;
     private double debitFunds;
-    private double cashback;
 }

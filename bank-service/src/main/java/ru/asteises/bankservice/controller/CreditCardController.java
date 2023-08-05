@@ -64,6 +64,6 @@ public class CreditCardController {
     @PatchMapping("/balance/pay/{cardId}")
     public ResponseEntity<CreditCardBalanceInfoDto> payFromCreditCard(@NonNull @PathVariable UUID cardId,
                                                                       @RequestParam double paySum) {
-        return ResponseEntity.ok((CreditCardBalanceInfoDto) creditCardService.refundBankCard(cardId, paySum));
+        return ResponseEntity.ok((CreditCardBalanceInfoDto) creditCardService.payFromBankCard(cardId, paySum));
     }
 }

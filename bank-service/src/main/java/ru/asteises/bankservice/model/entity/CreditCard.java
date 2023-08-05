@@ -21,7 +21,5 @@ public class CreditCard extends BankCard {
     private double creditFunds;
     @Column(name = "debit_funds")
     private double debitFunds;
-    @Column(name = "cashback")
-    private double cashback;
 
 }

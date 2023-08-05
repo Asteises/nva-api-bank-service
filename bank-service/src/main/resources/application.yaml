@@ -23,3 +23,6 @@ spring:
   liquibase:
     enabled: true
     change-log: 'classpath:db/changelog/changelog-master.yml'
+springdoc:
+  swagger-ui:
+    path: /bank-service/api

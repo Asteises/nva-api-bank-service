@@ -21,6 +21,7 @@
         <mapstruct-processor.version>1.5.3.Final</mapstruct-processor.version>
         <spring-boot-starter-validation.version>3.1.0</spring-boot-starter-validation.version>
         <liquibase-core.version>4.23.0</liquibase-core.version>
+        <swagger.version>2.1.0</swagger.version>
     </properties>
 
     <dependencies>
@@ -45,7 +46,7 @@
             <version>${spring-boot-starter-validation.version}</version>
         </dependency>
 
-        <!-- PostgreSQL -->
+        <!-- PostgresQL -->
 
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -75,6 +76,13 @@
             <version>${mapstruct-processor.version}</version>
         </dependency>
 
+        <!-- Swagger -->
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
 
 
         <!-- Test -->

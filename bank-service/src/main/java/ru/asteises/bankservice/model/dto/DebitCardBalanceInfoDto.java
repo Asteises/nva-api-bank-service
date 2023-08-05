@@ -8,4 +8,5 @@ import lombok.Setter;
 public class DebitCardBalanceInfoDto {
 
     private double balance;
+    private boolean isBlocked;
 }

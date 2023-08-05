@@ -11,4 +11,5 @@ public class CreditCardBalanceInfoDto {
     private double creditLimit;
     private double creditFunds;
     private double debitFunds;
+    private boolean isBlocked;
 }

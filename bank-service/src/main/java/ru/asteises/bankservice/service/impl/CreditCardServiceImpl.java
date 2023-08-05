@@ -3,6 +3,7 @@ package ru.asteises.bankservice.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.asteises.bankservice.exception.CardBlockedException;
 import ru.asteises.bankservice.exception.CreditCardNotFound;
 import ru.asteises.bankservice.exception.NotEnoughCreditFunds;
 import ru.asteises.bankservice.exception.NotEnoughFundsException;
@@ -10,6 +11,7 @@ import ru.asteises.bankservice.mapper.CreditCardMapper;
 import ru.asteises.bankservice.model.dto.CreditCardBalanceInfoDto;
 import ru.asteises.bankservice.model.dto.CreditCardVisualDto;
 import ru.asteises.bankservice.model.dto.NewCreditCardDto;
+import ru.asteises.bankservice.model.entity.BankCard;
 import ru.asteises.bankservice.model.entity.CreditCard;
 import ru.asteises.bankservice.repo.CreditCardRepo;
 import ru.asteises.bankservice.service.CreditCardService;
@@ -41,6 +43,7 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Override
     public CreditCardVisualDto changeCreditLimit(UUID cardId, double newCreditLimit) {
         CreditCard creditCard = getCreditCardFromRepo(cardId);
+        checkCardBlockStatus(creditCard);
         if (creditCard.getCreditFunds() == creditCard.getCreditLimit()) {
             creditCard.setCreditLimit(newCreditLimit);
             creditCard.setCreditFunds(newCreditLimit);
@@ -55,6 +58,7 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Override
     public CreditCardVisualDto blockCreditCardById(UUID cardId) {
         CreditCard creditCard = getCreditCardFromRepo(cardId);
+        checkCardBlockStatus(creditCard);
         creditCard.setBlocked(true);
         creditCardRepo.save(creditCard);
         log.info("Credit card {} is blocked {}", cardId, creditCard.isBlocked());
@@ -82,15 +86,17 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Override
     public CreditCardBalanceInfoDto refundBankCard(UUID cardId, double refundSum) {
         CreditCard creditCard = getCreditCardFromRepo(cardId);
+        checkCardBlockStatus(creditCard);
         refundBalance(creditCard, refundSum);
         creditCardRepo.save(creditCard);
-        log.info("Refund credit card success: {}", creditCard.toString());
+        log.info("Refund credit card success: {}", creditCard);
         return CreditCardMapper.INSTANCE.entityToBalanceInfoDto(creditCard);
     }
 
     @Override
     public CreditCardBalanceInfoDto payFromBankCard(UUID cardId, double paySum) throws NotEnoughFundsException {
         CreditCard creditCard = getCreditCardFromRepo(cardId);
+        checkCardBlockStatus(creditCard);
         // создаем переменную и передаем данные в метод оплаты
         Boolean isPaid = pay(creditCard, paySum);
         if (!isPaid) {
@@ -99,6 +105,13 @@ public class CreditCardServiceImpl implements CreditCardService {
             // обновляем данные в бд
             creditCardRepo.save(creditCard);
             return CreditCardMapper.INSTANCE.entityToBalanceInfoDto(creditCard);
+        }
+    }
+
+    @Override
+    public void checkCardBlockStatus(BankCard bankCard) {
+        if (bankCard.isBlocked()) {
+            throw new CardBlockedException(bankCard.getCardNumber());
         }
     }
 
@@ -191,4 +204,5 @@ public class CreditCardServiceImpl implements CreditCardService {
         }
         return 0.0;
     }
+
 }

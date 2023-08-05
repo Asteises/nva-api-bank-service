@@ -3,12 +3,14 @@ package ru.asteises.bankservice.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.asteises.bankservice.exception.CardBlockedException;
 import ru.asteises.bankservice.exception.DebitCardNotFound;
 import ru.asteises.bankservice.exception.NotEnoughFundsException;
 import ru.asteises.bankservice.mapper.DebitCardMapper;
 import ru.asteises.bankservice.model.dto.DebitCardBalanceInfoDto;
 import ru.asteises.bankservice.model.dto.DebitCardVisualDto;
 import ru.asteises.bankservice.model.dto.NewDebitCardDto;
+import ru.asteises.bankservice.model.entity.BankCard;
 import ru.asteises.bankservice.model.entity.DebitCard;
 import ru.asteises.bankservice.repo.DebitCardRepo;
 import ru.asteises.bankservice.service.DebitCardService;
@@ -27,7 +29,7 @@ public class DebitCardServiceImpl implements DebitCardService {
     public DebitCardVisualDto addNewDebitCard(NewDebitCardDto newDebitCardDto) {
         DebitCard debitCard = DebitCardMapper.INSTANCE.dtoToEntity(newDebitCardDto);
         debitCardRepo.save(debitCard);
-        log.info("New debit card create: {}", debitCard.toString());
+        log.info("New debit card create: {}", debitCard);
         return DebitCardMapper.INSTANCE.entityToVisualDto(debitCard);
     }
 
@@ -40,6 +42,7 @@ public class DebitCardServiceImpl implements DebitCardService {
     @Override
     public DebitCardVisualDto blockDebitCardById(UUID cardId) {
         DebitCard debitCard = getDebitCardFromRepo(cardId);
+        checkCardBlockStatus(debitCard);
         debitCard.setBlocked(true);
         debitCardRepo.save(debitCard);
         log.info("Debit card {} is blocked {}", cardId, debitCard.isBlocked());
@@ -67,6 +70,7 @@ public class DebitCardServiceImpl implements DebitCardService {
     @Override
     public DebitCardBalanceInfoDto refundBankCard(UUID cardId, double refundSum) {
         DebitCard debitCard = getDebitCardFromRepo(cardId);
+        checkCardBlockStatus(debitCard);
         debitCardRepo.save(refundBalance(debitCard, refundSum));
         log.info("Refund debit card success: {}", debitCard.getBalance());
         return DebitCardMapper.INSTANCE.entityToBalanceInfoDto(debitCard);
@@ -75,6 +79,7 @@ public class DebitCardServiceImpl implements DebitCardService {
     @Override
     public DebitCardBalanceInfoDto payFromBankCard(UUID cardId, double paySum) {
         DebitCard debitCard = getDebitCardFromRepo(cardId);
+        checkCardBlockStatus(debitCard);
         // создаем переменную и передаем данные в метод оплаты
         Boolean isPaid = pay(debitCard, paySum);
         if (!isPaid) {
@@ -83,6 +88,13 @@ public class DebitCardServiceImpl implements DebitCardService {
             // обновляем данные в бд
             debitCardRepo.save(debitCard);
             return DebitCardMapper.INSTANCE.entityToBalanceInfoDto(debitCard);
+        }
+    }
+
+    @Override
+    public void checkCardBlockStatus(BankCard bankCard) {
+        if (bankCard.isBlocked()) {
+            throw new CardBlockedException(bankCard.getCardNumber());
         }
     }
 

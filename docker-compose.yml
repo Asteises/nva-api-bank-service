@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  bank-service:
+    image: bank_service
+    build:
+      context: ./bank-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - bank-service-db
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://bank-service-db:5432/bank-service
+    networks:
+      - bank_service_network
+
+  bank-service-db:
+    image: postgres:14.7-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - bank_service_network
+    restart: on-failure
+
+networks:
+  bank_service_network:
+    external: true
+    name: bank_service_network

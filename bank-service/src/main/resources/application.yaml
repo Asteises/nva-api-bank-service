@@ -2,13 +2,17 @@ spring:
   datasource:
 
   # localhost
-    url: jdbc:postgresql://localhost:5432/bank-service
-    username: postgres
-    password: postgres
+    #url: jdbc:postgresql://localhost:5432/bank-service
+    #username: postgres
+    #password: postgres
 
+  # Docker
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
-#  sql:
+  #  sql:
 #    init:
 #      mode: always
   jpa:
@@ -22,7 +26,10 @@ spring:
   mandatory-file-encoding: UTF-8
   liquibase:
     enabled: true
+    drop-first: false
     change-log: 'classpath:db/changelog/changelog-master.yml'
+    default-schema: public
+
 springdoc:
   swagger-ui:
     path: /bank-service/api

@@ -1,15 +1,12 @@
-version: '3.8'
 services:
   bank-service:
-    image: bank_service
     build:
       context: ./bank-service
       dockerfile: Dockerfile
     container_name: bank_service
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: bank-service-db
+      DATABASE_HOST: bank-service-db
+      DATABASE_PORT: 5434
     ports:
       - "8185:8185"
     depends_on:
@@ -18,16 +15,16 @@ services:
       - bank_service_network
 
   bank-service-db:
-    image: postgres:14.7-alpine
+    image: postgres:14.6
     container_name: bank_service_db
-    ports:
-      - "6542:5432"
-    volumes:
-      - /var/lib/postgresql/data/
     environment:
-      POSTGRES_DB: bank-service-db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bank-service-db
+    ports:
+      - "5434:5434"
+    volumes:
+      - ./bank-service-db:/var/lib/postgresql/data/
     networks:
       - bank_service_network
     restart: on-failure

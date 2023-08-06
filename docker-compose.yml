@@ -7,11 +7,11 @@ services:
       dockerfile: Dockerfile
     container_name: bank_service
     environment:
-      DATABASE_HOST: jdbc:postgresql://bank-service-db:5432/bank-service-db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bank-service-db
     ports:
-      - "8085:8085"
+      - "8185:8185"
     depends_on:
       - bank-service-db
     networks:

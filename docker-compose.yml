@@ -5,23 +5,29 @@ services:
     build:
       context: ./bank-service
       dockerfile: Dockerfile
+    container_name: bank_service
+    environment:
+      DATABASE_HOST: jdbc:postgresql://bank-service-db:5432/bank-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "8080:8080"
+      - "8085:8085"
     depends_on:
       - bank-service-db
-    environment:
-      SERVER_PORT: 8080
-      SPRING_DATASOURCE_URL: jdbc:postgresql://bank-service-db:5432/bank-service
     networks:
       - bank_service_network
 
   bank-service-db:
     image: postgres:14.7-alpine
+    container_name: bank_service_db
+    ports:
+      - "6542:5432"
+    volumes:
+      - /var/lib/postgresql/data/
     environment:
+      POSTGRES_DB: bank-service-db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
     networks:
       - bank_service_network
     restart: on-failure

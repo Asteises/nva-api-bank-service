@@ -1,13 +1,15 @@
+server:
+  port: 8085
 spring:
   datasource:
 
   # localhost
-    #url: jdbc:postgresql://localhost:5432/bank-service
+    #url: jdbc:postgresql://localhost:5432/bank-service-db
     #username: postgres
     #password: postgres
 
   # Docker
-    url: ${SPRING_DATASOURCE_URL}
+    url: ${DATABASE_HOST}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -17,12 +19,13 @@ spring:
 #      mode: always
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
   mandatory-file-encoding: UTF-8
   liquibase:
     enabled: true

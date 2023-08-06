@@ -1,6 +1,3 @@
-DROP TABLE IF EXISTS credit_cards;
-DROP TABLE IF EXISTS debit_cards;
-
 CREATE TABLE IF NOT EXISTS credit_cards
 (
     id           UUID PRIMARY KEY   NOT NULL,

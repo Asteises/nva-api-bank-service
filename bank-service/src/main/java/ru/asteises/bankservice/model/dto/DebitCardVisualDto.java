@@ -1,16 +1,16 @@
 package ru.asteises.bankservice.model.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.UUID;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class NewCardDto {
+public class DebitCardVisualDto {
 
+    private UUID id;
     private String cardNumber;
+    private double balance;
     private boolean isBlocked;
 }

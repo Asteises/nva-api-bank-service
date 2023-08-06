@@ -1,21 +1,39 @@
+server:
+  port: 8185
 spring:
   datasource:
+    driver-class-name: org.postgresql.Driver
+    # localhost
+    #url: jdbc:postgresql://localhost:5432/bank-service-db
+    #username: postgres
+    #password: postgres
 
-  # localhost
-    url: jdbc:postgresql://localhost:5432/bank-service
+    # Docker
     username: postgres
     password: postgres
+    url: jdbc:postgresql://bank-service-db:5434/bank-service-db
 
-    driver-class-name: org.postgresql.Driver
 
-  sql:
-    init:
-      mode: always
+  #  sql:
+  #    init:
+  #      mode: always
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl:
+          auto: validate
+    defer-datasource-initialization: false
+    open-in-view: false
+  mandatory-file-encoding: UTF-8
+  liquibase:
+    enabled: true
+    change-log: 'classpath:db/changelog/changelog-master.yml'
+
+springdoc:
+  swagger-ui:
+    path: /bank-service/api

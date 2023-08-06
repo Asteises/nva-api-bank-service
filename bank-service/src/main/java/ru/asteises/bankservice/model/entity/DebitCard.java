@@ -1,13 +1,17 @@
 package ru.asteises.bankservice.model.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-
-import java.util.UUID;
+import jakarta.persistence.Table;
+import lombok.*;
 
 @Entity
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "debit_cards")
 public class DebitCard extends BankCard {
 
-    @Id
-    UUID id;
+    private double balance;
 }

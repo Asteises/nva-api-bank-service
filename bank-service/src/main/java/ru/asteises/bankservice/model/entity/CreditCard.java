@@ -1,7 +1,6 @@
 package ru.asteises.bankservice.model.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;

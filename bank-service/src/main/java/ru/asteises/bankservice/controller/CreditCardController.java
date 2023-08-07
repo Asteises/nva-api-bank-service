@@ -24,7 +24,7 @@ public class CreditCardController {
         return ResponseEntity.ok(creditCardService.addNewCreditCard(newCreditCardDto));
     }
 
-    @GetMapping("/get/{cardId}")
+    @GetMapping("/{cardId}")
     public ResponseEntity<CreditCardVisualDto> getCreditCardById(@NonNull @PathVariable UUID cardId) {
         return ResponseEntity.ok(creditCardService.getCreditCardById(cardId));
     }
@@ -40,12 +40,12 @@ public class CreditCardController {
         return ResponseEntity.ok(creditCardService.blockCreditCardById(cardId));
     }
 
-    @GetMapping("/get/all")
+    @GetMapping("/all")
     public ResponseEntity<List<CreditCardVisualDto>> getAllNonBlockedCreditCards() {
         return ResponseEntity.ok(creditCardService.getAllNonBlockedCreditCards());
     }
 
-    @GetMapping("/get/all/blocked")
+    @GetMapping("/all/blocked")
     public ResponseEntity<List<CreditCardVisualDto>> getAllBlockedCreditCards() {
         return ResponseEntity.ok(creditCardService.getAllBlockedCards());
     }

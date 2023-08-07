@@ -21,7 +21,10 @@ public interface CreditCardMapper {
 
     @Mapping(target = "id", expression = "java(UUID.randomUUID())")
     CreditCard dtoToEntity(NewCreditCardDto newCreditCardDto);
+
     CreditCardVisualDto entityToVisualDto(CreditCard creditCard);
+
     List<CreditCardVisualDto> entityToVisualDto(List<CreditCard> creditCards);
+
     CreditCardBalanceInfoDto entityToBalanceInfoDto(CreditCard creditCard);
 }

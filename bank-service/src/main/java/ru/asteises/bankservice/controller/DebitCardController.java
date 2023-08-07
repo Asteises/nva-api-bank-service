@@ -5,7 +5,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.asteises.bankservice.model.dto.CreditCardBalanceInfoDto;
 import ru.asteises.bankservice.model.dto.DebitCardBalanceInfoDto;
 import ru.asteises.bankservice.model.dto.DebitCardVisualDto;
 import ru.asteises.bankservice.model.dto.NewDebitCardDto;
@@ -26,7 +25,7 @@ public class DebitCardController {
         return ResponseEntity.ok(debitCardService.addNewDebitCard(newDebitCardDto));
     }
 
-    @GetMapping("/get/{cardId}")
+    @GetMapping("/{cardId}")
     public ResponseEntity<DebitCardVisualDto> getDebitCardById(@NotNull @PathVariable UUID cardId) {
         return ResponseEntity.ok(debitCardService.getDebitCardById(cardId));
     }
@@ -36,12 +35,12 @@ public class DebitCardController {
         return ResponseEntity.ok(debitCardService.blockDebitCardById(cardId));
     }
 
-    @GetMapping("/get/all")
+    @GetMapping("/all")
     public ResponseEntity<List<DebitCardVisualDto>> getAllNonBlockedDebitCards() {
         return ResponseEntity.ok(debitCardService.getAllNonBlockedDebitCards());
     }
 
-    @GetMapping("/get/all/blocked")
+    @GetMapping("/all/blocked")
     public ResponseEntity<List<DebitCardVisualDto>> getAllBlockedDebitCards() {
         return ResponseEntity.ok(debitCardService.getAllBlockedDebitCards());
     }
@@ -53,13 +52,13 @@ public class DebitCardController {
 
     @PatchMapping("/balance/refund/{cardId}")
     public ResponseEntity<DebitCardBalanceInfoDto> refundDebitCard(@NonNull @PathVariable UUID cardId,
-                                                                     @RequestParam double refundSum) {
+                                                                   @RequestParam double refundSum) {
         return ResponseEntity.ok((DebitCardBalanceInfoDto) debitCardService.refundBankCard(cardId, refundSum));
     }
 
     @PatchMapping("/balance/pay/{cardId}")
     public ResponseEntity<DebitCardBalanceInfoDto> payFromDebitCard(@NonNull @PathVariable UUID cardId,
-                                                                      @RequestParam double paySum) {
+                                                                    @RequestParam double paySum) {
         return ResponseEntity.ok((DebitCardBalanceInfoDto) debitCardService.payFromBankCard(cardId, paySum));
     }
 }
